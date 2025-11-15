@@ -92,3 +92,44 @@ public class Customer {
 ![h2 database](images/2.png)
 
 
+<h1> Etape 2 Microservice : Inventory-Service</h1>
+
+
+![Liste clients](images/2service.png)
+
+<p>H2 database products-db </p> 
+
+![3](images/3.png)
+
+<p>L'etat du service avec (health) </p>
+
+![4](images/4.png)
+
+<p>Tous les ends points que generent Actuator </p>
+
+![5](images/5.png)
+
+
+<h2> Test de l’API</h2>
+
+<p>Une fois le microservice lancé :</p>
+
+<ul>
+  <li><strong>URL principale :</strong> <code>http://localhost:8082/api/products</code></li>
+  <li>Affiche tous les produits disponibles.</li>
+</ul>
+
+<p>Exemple d'appel avec <strong>curl</strong> :</p>
+
+<pre>
+curl http://localhost:8082/api/products
+</pre>
+
+<hr/>
+
+
+
+
+
+
+
