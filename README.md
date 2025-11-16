@@ -6,8 +6,7 @@
   <strong>H2</strong> et charge des clients par défaut au démarrage.
 </p>
 
-<hr/>
-
+<hr/> 
 
 
 <h2> 1. Package <code>entities</code></h2>
@@ -126,6 +125,111 @@ curl http://localhost:8082/api/products
 </pre>
 
 <hr/>
+
+<h1> Etape 3 Microservice : Gateway-Service</h1>
+
+<p>
+  Le microservice <strong>gateway-service</strong> joue le rôle de point d’entrée unique dans l’architecture microservices.
+  Il utilise <strong>Spring Cloud Gateway MVC</strong> pour router les requêtes et <strong>Eureka Discovery</strong> pour
+  détecter automatiquement les microservices actifs.
+</p>
+
+<ul>
+  <li>Centralisation des appels API</li>
+  <li>Redirection vers les microservices internes</li>
+  <li>Simplification de l’accès pour le frontend</li>
+  <li>Possibilité d'ajouter sécurité, CORS, authentification</li>
+</ul>
+
+<hr/>
+
+<h2>1. Configuration <code>application.yml</code></h2>
+
+<p>La Gateway écoute sur le port <strong>8888</strong> et redirige les requêtes selon leur chemin.</p>
+
+<pre>
+server:
+  port: 8888
+
+spring:
+  application:
+    name: gateway-service
+
+  cloud:
+    gateway:
+      mvc:
+        routes:
+          - id: customer-service
+            uri: http://localhost:8081
+            predicates:
+              - Path=/api/customers/**
+
+          - id: inventory-service
+            uri: http://localhost:8082
+            predicates:
+              - Path=/api/products/**
+</pre>
+
+<p>
+  Chaque route correspond à un microservice interne.  
+  La Gateway fait le lien entre les URL externes et les APIs internes.
+</p>
+
+<hr/>
+
+<h2>2. Fonctionnement de l’API Gateway</h2>
+
+<p>
+  Grâce à la Gateway, le frontend ou les clients externes n'ont plus besoin de connaître les ports internes.
+  Ils accèdent à tous les services via un seul point : <strong>http://localhost:8888</strong>
+</p>
+
+<ul>
+  <li><code>http://localhost:8888/api/products</code> → Inventory-Service (8082)</li>
+  <li><code>http://localhost:8888/api/customers</code> → Customer-Service (8081)</li>
+</ul>
+
+<p>
+  Cela rend l'architecture plus flexible, plus sécurisée et beaucoup plus simple à consommer.
+</p>
+
+<hr/>
+
+<h2>3. Avantages de l'API Gateway</h2>
+
+<ul>
+  <li><strong>Point d’entrée unique</strong> pour tout le système</li>
+  <li><strong>Découplage</strong> entre frontend et microservices</li>
+  <li><strong>Routage intelligent</strong> (basé sur les paths)</li>
+  <li><strong>Support d’Eureka</strong> pour détecter les services</li>
+  <li><strong>Extensible</strong> (sécurité, rate limiting, monitoring…)</li>
+</ul>
+
+<hr/>
+
+<h2>4. Test de la Gateway</h2>
+
+<p>Une fois la Gateway lancée :</p>
+
+<ul>
+  <li><strong>Produits via Gateway :</strong> <code>http://localhost:8888/api/products</code></li>
+  <li><strong>Clients via Gateway :</strong> <code>http://localhost:8888/api/customers</code></li>
+</ul>
+
+<p>La Gateway se charge automatiquement du routage vers les microservices internes.</p>
+
+<hr/>
+
+<h2>Aperçu des résultats via Gateway</h2>
+
+<p><strong>1. Liste des produits via Gateway :</strong></p>
+<img src="images/7.png" alt="Liste produits Gateway"/>
+
+<p><strong>2. Liste des clients via Gateway :</strong></p>
+<img src="images/6.png" alt="Liste clients Gateway"/>
+
+<hr/>
+
 
 
 
