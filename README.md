@@ -336,7 +336,37 @@ Les endpoints sont accessibles de manière centralisée sur :
 <p><strong>Architecture totalement opérationnelle </strong></p>
 
 
+<h1> Étape 5 Microservice : Billing-Service</h1>
+
+<p> Le microservice <strong>billing-service</strong> gère la création des factures. Il communique avec <strong>Customer-Service</strong> et <strong>Inventory-Service</strong> grâce à <strong>OpenFeign</strong>, et s’enregistre automatiquement dans <strong>Eureka</strong>. Une base <strong>H2</strong> stocke les factures et leurs articles. </p> <hr/>
+<h2>1. Package <code>entities</code></h2>
+
+<h3> Bill.java</h3> <pre> @Entity @Data @NoArgsConstructor @AllArgsConstructor @Builder public class Bill { @Id @GeneratedValue(strategy = GenerationType.IDENTITY) private Long id; private Long customerID; private Date billingDate; @OneToMany(mappedBy = "bill") private List<ProductItem> productItems; @Transient private Customer customer; } </pre> <h3>✔ ProductItem.java</h3> <pre> @Entity @Data @NoArgsConstructor @AllArgsConstructor @Builder public class ProductItem { @Id @GeneratedValue(strategy = GenerationType.IDENTITY) private Long id; private Long productID; private int quantity; private double price; @ManyToOne private Bill bill; @Transient private Product product; } </pre> <hr/>
+<h2>2. Feign Clients</h2>
+<p>Permettent de récupérer les données des autres microservices :</p> <pre> @FeignClient(name="CUSTOMER-SERVICE") interface CustomerRestClient { @GetMapping("/api/customers/{id}") Customer findCustomerById(@PathVariable Long id); } </pre> <pre> @FeignClient(name="INVENTORY-SERVICE") interface InventoryRestClient { @GetMapping("/api/products/{id}") Product findProductById(@PathVariable String id); } </pre> <hr/>
+<h2>3. Initialisation des données</h2>
+<p>Au démarrage, une facture est créée automatiquement :</p> <pre> @Bean CommandLineRunner start(...) { return args -> { Customer c = customerClient.findCustomerById(1L); Bill bill = billRepository.save(new Bill(null, c.getId(), new Date(), null, null)); Product p = inventoryClient.findProductById("id1"); productItemRepository.save( ProductItem.builder().productID(p.getId()).price(p.getPrice()).quantity(3).bill(bill).build() ); }; } </pre> <hr/>
+<h2>4. Test de l’API</h2>
+<ul> <li><code>GET http://localhost:8083/bills</code></li> <li><code>GET http://localhost:8083/bills/{id}</code></li> </ul> <p>La réponse est automatiquement enrichie avec :</p> <ul> <li>le <strong>client</strong> associé (via Customer-Service)</li> <li>les <strong>produits</strong> associés (via Inventory-Service)</li> </ul> <hr/>
+<h2>5. Accès via Gateway</h2>
+<p>Grâce à Eureka + Gateway :</p> <ul> <li><strong>http://localhost:8888/billing-service/bills</strong></li> </ul> <p>Plus besoin de connaître les ports internes.</p> <hr/>
+<h2>Architecture après ajout</h2>
+<pre> Gateway (8888) | -------------------------------- | | | Customer Inventory Billing 8081 8082 8083 \ | / Eureka (8761) </pre>
 
 
+<p><strong>1. h2 console : table=bill :</strong></p>
+<img src="images/11.png" alt="Liste produits Gateway"/>
+
+<p><strong>2. h2 console : table=product_item  :</strong></p>
+<img src="images/12.png" alt="Liste produits Gateway"/>
 
 
+<p><strong>3. Dashboard de Eureka apres l'ajout de notre billing-service  :</strong></p>
+<img src="images/14.png" alt="Liste produits Gateway"/>
+
+<p><strong>4. Gestion de factures avec customer_id et product_id  :</strong></p>
+<img src="images/13.png" alt="Liste produits Gateway"/>
+
+<img src="images/15.png" alt="Liste produits Gateway"/>
+
+<img src="images/16.png" alt="Liste produits Gateway"/>
