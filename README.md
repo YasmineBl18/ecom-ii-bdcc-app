@@ -231,6 +231,109 @@ spring:
 <hr/>
 
 
+<h1> Étape 4 — Discovery-Service (Eureka Server)</h1>
+
+<p>
+Le microservice <strong>discovery-service</strong> joue le rôle de 
+<strong>registre de services</strong> (Service Registry).  
+Il permet :
+</p>
+
+<ul>
+  <li>La <strong>découverte dynamique</strong> des microservices</li>
+  <li>L'<strong>enregistrement automatique</strong> de Customer-Service, Inventory-Service et Gateway</li>
+  <li>Le <strong>load balancing</strong> avec Eureka + Gateway</li>
+  <li>Un dashboard web pour monitorer les services</li>
+</ul>
+
+<hr/>
+
+<h2> 1. Configuration Eureka</h2>
+
+<h3>application.properties</h3>
+
+<pre>
+spring.application.name=discovery-service
+server.port=8761
+
+eureka.client.fetch-registry=false
+eureka.client.register-with-eureka=false
+</pre>
+
+<hr/>
+
+<h2> 2. Classe principale</h2>
+
+<pre>
+@SpringBootApplication
+@EnableEurekaServer
+public class DiscoveryServiceApplication {
+    public static void main(String[] args) {
+        SpringApplication.run(DiscoveryServiceApplication.class, args);
+    }
+}
+</pre>
+
+<hr/>
+
+<h2> 3. Lancement d’Eureka</h2>
+
+<p>Une fois démarré :</p>
+
+<ul>
+  <li>Dashboard disponible ici :  
+      <strong>http://localhost:8761</strong>
+  </li>
+</ul>
+
+
+<p><strong>1. Dashboard de Eureka avec les nos micro-services  :</strong></p>
+<img src="images/8.png" alt="Liste produits Gateway"/>
+
+<p><strong>2. Liste des clients avec routage dynamique  :</strong></p>
+<img src="images/9.png" alt="Liste produits Gateway"/>
+
+<p><strong>3. Liste des produits avec routage dynamique :</strong></p>
+<img src="images/99.png" alt="Liste produits Gateway"/>
+
+
+<p>
+On constate que :</p>
+<ul>
+  <li><strong>CUSTOMER-SERVICE</strong> est UP</li>
+  <li><strong>INVENTORY-SERVICE</strong> est UP</li>
+  <li><strong>GATEWAY-SERVICE</strong> est UP</li>
+</ul>
+
+<hr/>
+
+<h2> Architecture finale </h2>
+
+<pre>
+   Gateway-Service (8888)
+          |
+   -------------------------
+   |                       |
+Customer-Service      Inventory-Service
+     8081                  8082
+          \               /
+            Eureka Server (8761)
+</pre>
+
+<hr/>
+
+<h2>  Projet Microservices Fonctionnel </h2>
+<p>
+Tous les services communiquent correctement via Eureka et la Gateway.  
+Les endpoints sont accessibles de manière centralisée sur :
+</p>
+
+<ul>
+  <li><strong>http://localhost:8888/customer-service/api/customers</strong></li>
+  <li><strong>http://localhost:8888/product-service/api/products</strong></li>
+</ul>
+
+<p><strong>Architecture totalement opérationnelle </strong></p>
 
 
 
