@@ -370,3 +370,35 @@ Les endpoints sont accessibles de manière centralisée sur :
 <img src="images/15.png" alt="Liste produits Gateway"/>
 
 <img src="images/16.png" alt="Liste produits Gateway"/>
+
+
+<p><strong>5. Gestion de factures avec customer_id et product_id  :</strong></p>
+
+<img src="images/99.png" alt="Liste produits Gateway"/>
+
+
+
+<h1> Étape 6 Microservice : config-service</h1>
+
+
+
+<p><strong>1.Test des endpoints | environnement par default de dev avec customer-service :</strong></p>
+<img src="images/22.png" alt="Liste produits Gateway"/>
+
+<p><strong>2. Test des endpoints:environnement par default de dev avec application/default </strong></p>
+<img src="images/23.png" alt="default"/>
+
+<p><strong>3.Test des endpoints : environnement de prod</strong></p>
+<img src="images/24.png" alt="prod"/>
+
+
+
+<p>Nous avions déjà configuré notre Customer Service, mais nous avons ensuite activé l’intégration 
+avec Spring Cloud Config en ajoutant spring.cloud.config.enabled=true dans application.properties. 
+Pour vérifier que le service récupère bien les paramètres depuis le Config Service, nous avons créé un contrôleur dans le package config avec l’endpoint /testConfig1.
+Cet endpoint retourne les valeurs de p1 et p2, 
+ce qui constitue une preuve directe que Customer Service communique correctement avec le Config Service et charge sa configuration externe.</p>
+
+<img src="images/31.png" alt="prod"/>
+
+<img src="images/32.png" alt="prod"/>
