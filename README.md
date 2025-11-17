@@ -1,17 +1,16 @@
-<h1> Etape 1 Microservice : Customer-Service</h1>
+<h1> Étape 1 — Microservice : Customer-Service</h1>
 
 <p>
-  Le microservice <strong>customer-service</strong> permet de gérer les clients dans une architecture microservices.
-  Il expose des endpoints REST via <strong>Spring Data REST</strong>, utilise une base de données 
-  <strong>H2</strong> et charge des clients par défaut au démarrage.
+  Le microservice <strong>customer-service</strong> gère les clients dans l’architecture microservices.
+  Il expose des endpoints REST via <strong>Spring Data REST</strong>, utilise une base <strong>H2</strong> 
+  et charge des clients par défaut au démarrage.
 </p>
 
-<hr/> 
+<hr/>
 
+<h2>1. Package <code>entities</code></h2>
 
-<h2> 1. Package <code>entities</code></h2>
-
-<p>Ce package contient les classes métier. L’entité principale est <strong>Customer</strong>.</p>
+<p>L’entité principale est <strong>Customer</strong>.</p>
 
 <h3>✔ Customer.java</h3>
 
@@ -26,22 +25,16 @@ public class Customer {
 }
 </pre>
 
-<p>
-   Représente un client dans la base de données.<br/>
-   Lombok génère automatiquement getters, setters et constructeurs.
-</p>
+<p>Lombok génère automatiquement getters, setters et constructeurs.</p>
 
 <hr/>
 
-<h2> 2. Package <code>repositories</code></h2>
+<h2>2. Package <code>repositories</code></h2>
 
 <p>
-  Ce package contient l’interface JPA qui permet d’accéder aux données.
-  Spring Data REST expose automatiquement les endpoints REST.
+  Contient l’interface JPA pour accéder aux données.
+  Spring Data REST expose automatiquement plusieurs endpoints :
 </p>
-
-
-<p>Endpoints exposés automatiquement :</p>
 
 <ul>
   <li><code>GET /api/customers</code></li>
@@ -52,18 +45,13 @@ public class Customer {
 
 <hr/>
 
-<h2> 3. Package <code>config</code></h2>
+<h2>3. Package <code>config</code></h2>
 
 <p>
-  Par défaut, Spring Data REST masque les IDs dans le JSON. <br/>
-  Ce package contient la configuration qui permet de <strong>rendre les IDs visibles</strong>.
+  Ce package contient la configuration permettant de <strong>rendre les IDs visibles</strong> dans les réponses JSON.
 </p>
 
-<h3> RepositoryConfig.java</h3>
-
-
-
-<p> Cela permet d'afficher les identifiants dans les réponses JSON :</p>
+<h3>Exemple :</h3>
 
 <pre>
 {
@@ -77,48 +65,31 @@ public class Customer {
 
 <h2> Test de l’API</h2>
 
-<p>Une fois le microservice lancé :</p>
-
 <ul>
-  <li><strong>URL principale :</strong> <code>http://localhost:8081/api/customers</code></li>
-  <li>Affiche la liste complète des clients avec leurs IDs visibles.</li>
+  <li><strong>URL :</strong> <code>http://localhost:8081/api/customers</code></li>
+  <li>Affiche la liste des clients avec IDs visibles.</li>
 </ul>
+
+<img src="images/1service.png"/>
+<img src="images/2.png"/>
 
 <hr/>
 
-![Liste clients](images/1service.png)
+<h1> Étape 2 — Microservice : Inventory-Service</h1>
 
-![h2 database](images/2.png)
+<img src="images/2service.png"/>
 
+<p>Base H2 : <strong>products-db</strong></p> 
 
-<h1> Etape 2 Microservice : Inventory-Service</h1>
+<img src="images/3.png"/>
+<img src="images/4.png"/>
+<img src="images/5.png"/>
 
-
-![Liste clients](images/2service.png)
-
-<p>H2 database products-db </p> 
-
-![3](images/3.png)
-
-<p>L'etat du service avec (health) </p>
-
-![4](images/4.png)
-
-<p>Tous les ends points que generent Actuator </p>
-
-![5](images/5.png)
-
-
-<h2> Test de l’API</h2>
-
-<p>Une fois le microservice lancé :</p>
+<h2>Test de l’API</h2>
 
 <ul>
-  <li><strong>URL principale :</strong> <code>http://localhost:8082/api/products</code></li>
-  <li>Affiche tous les produits disponibles.</li>
+  <li><code>GET http://localhost:8082/api/products</code></li>
 </ul>
-
-<p>Exemple d'appel avec <strong>curl</strong> :</p>
 
 <pre>
 curl http://localhost:8082/api/products
@@ -126,26 +97,23 @@ curl http://localhost:8082/api/products
 
 <hr/>
 
-<h1> Etape 3 Microservice : Gateway-Service</h1>
+<h1> Étape 3 — Microservice : Gateway-Service</h1>
 
 <p>
-  Le microservice <strong>gateway-service</strong> joue le rôle de point d’entrée unique dans l’architecture microservices.
-  Il utilise <strong>Spring Cloud Gateway MVC</strong> pour router les requêtes et <strong>Eureka Discovery</strong> pour
-  détecter automatiquement les microservices actifs.
+  Le <strong>gateway-service</strong> est le point d’entrée unique.  
+  Il utilise <strong>Spring Cloud Gateway MVC</strong> et <strong>Eureka Discovery</strong>.
 </p>
 
 <ul>
-  <li>Centralisation des appels API</li>
-  <li>Redirection vers les microservices internes</li>
+  <li>Centralisation des requêtes</li>
+  <li>Routage vers les microservices internes</li>
   <li>Simplification de l’accès pour le frontend</li>
-  <li>Possibilité d'ajouter sécurité, CORS, authentification</li>
+  <li>Possibilité d’ajouter sécurité, CORS, authentification…</li>
 </ul>
 
 <hr/>
 
-<h2>1. Configuration <code>application.yml</code></h2>
-
-<p>La Gateway écoute sur le port <strong>8888</strong> et redirige les requêtes selon leur chemin.</p>
+<h2>Configuration <code>application.yml</code></h2>
 
 <pre>
 server:
@@ -170,87 +138,30 @@ spring:
               - Path=/api/products/**
 </pre>
 
-<p>
-  Chaque route correspond à un microservice interne.  
-  La Gateway fait le lien entre les URL externes et les APIs internes.
-</p>
-
 <hr/>
 
-<h2>2. Fonctionnement de l’API Gateway</h2>
-
-<p>
-  Grâce à la Gateway, le frontend ou les clients externes n'ont plus besoin de connaître les ports internes.
-  Ils accèdent à tous les services via un seul point : <strong>http://localhost:8888</strong>
-</p>
+<h2> Test de la Gateway</h2>
 
 <ul>
-  <li><code>http://localhost:8888/api/products</code> → Inventory-Service (8082)</li>
-  <li><code>http://localhost:8888/api/customers</code> → Customer-Service (8081)</li>
+  <li><code>http://localhost:8888/api/products</code> → Inventory-Service</li>
+  <li><code>http://localhost:8888/api/customers</code> → Customer-Service</li>
 </ul>
 
-<p>
-  Cela rend l'architecture plus flexible, plus sécurisée et beaucoup plus simple à consommer.
-</p>
+<img src="images/7.png"/>
+<img src="images/6.png"/>
 
 <hr/>
-
-<h2>3. Avantages de l'API Gateway</h2>
-
-<ul>
-  <li><strong>Point d’entrée unique</strong> pour tout le système</li>
-  <li><strong>Découplage</strong> entre frontend et microservices</li>
-  <li><strong>Routage intelligent</strong> (basé sur les paths)</li>
-  <li><strong>Support d’Eureka</strong> pour détecter les services</li>
-  <li><strong>Extensible</strong> (sécurité, rate limiting, monitoring…)</li>
-</ul>
-
-<hr/>
-
-<h2>4. Test de la Gateway</h2>
-
-<p>Une fois la Gateway lancée :</p>
-
-<ul>
-  <li><strong>Produits via Gateway :</strong> <code>http://localhost:8888/api/products</code></li>
-  <li><strong>Clients via Gateway :</strong> <code>http://localhost:8888/api/customers</code></li>
-</ul>
-
-<p>La Gateway se charge automatiquement du routage vers les microservices internes.</p>
-
-<hr/>
-
-<h2>Aperçu des résultats via Gateway</h2>
-
-<p><strong>1. Liste des produits via Gateway :</strong></p>
-<img src="images/7.png" alt="Liste produits Gateway"/>
-
-<p><strong>2. Liste des clients via Gateway :</strong></p>
-<img src="images/6.png" alt="Liste clients Gateway"/>
-
-<hr/>
-
 
 <h1> Étape 4 — Discovery-Service (Eureka Server)</h1>
 
 <p>
-Le microservice <strong>discovery-service</strong> joue le rôle de 
-<strong>registre de services</strong> (Service Registry).  
-Il permet :
+  Le <strong>discovery-service</strong> est le registre Eureka.  
+  Il assure la découverte dynamique et l’enregistrement automatique des microservices.
 </p>
-
-<ul>
-  <li>La <strong>découverte dynamique</strong> des microservices</li>
-  <li>L'<strong>enregistrement automatique</strong> de Customer-Service, Inventory-Service et Gateway</li>
-  <li>Le <strong>load balancing</strong> avec Eureka + Gateway</li>
-  <li>Un dashboard web pour monitorer les services</li>
-</ul>
 
 <hr/>
 
-<h2> 1. Configuration Eureka</h2>
-
-<h3>application.properties</h3>
+<h2> Configuration</h2>
 
 <pre>
 spring.application.name=discovery-service
@@ -260,50 +171,11 @@ eureka.client.fetch-registry=false
 eureka.client.register-with-eureka=false
 </pre>
 
-<hr/>
+<p>Dashboard : <strong>http://localhost:8761</strong></p>
 
-<h2> 2. Classe principale</h2>
-
-<pre>
-@SpringBootApplication
-@EnableEurekaServer
-public class DiscoveryServiceApplication {
-    public static void main(String[] args) {
-        SpringApplication.run(DiscoveryServiceApplication.class, args);
-    }
-}
-</pre>
-
-<hr/>
-
-<h2> 3. Lancement d’Eureka</h2>
-
-<p>Une fois démarré :</p>
-
-<ul>
-  <li>Dashboard disponible ici :  
-      <strong>http://localhost:8761</strong>
-  </li>
-</ul>
-
-
-<p><strong>1. Dashboard de Eureka avec les nos micro-services  :</strong></p>
-<img src="images/8.png" alt="Liste produits Gateway"/>
-
-<p><strong>2. Liste des clients avec routage dynamique  :</strong></p>
-<img src="images/9.png" alt="Liste produits Gateway"/>
-
-<p><strong>3. Liste des produits avec routage dynamique :</strong></p>
-<img src="images/99.png" alt="Liste produits Gateway"/>
-
-
-<p>
-On constate que :</p>
-<ul>
-  <li><strong>CUSTOMER-SERVICE</strong> est UP</li>
-  <li><strong>INVENTORY-SERVICE</strong> est UP</li>
-  <li><strong>GATEWAY-SERVICE</strong> est UP</li>
-</ul>
+<img src="images/8.png"/>
+<img src="images/9.png"/>
+<img src="images/99.png"/>
 
 <hr/>
 
@@ -322,83 +194,140 @@ Customer-Service      Inventory-Service
 
 <hr/>
 
-<h2>  Projet Microservices Fonctionnel </h2>
+<h1> Étape 5 — Microservice : Billing-Service</h1>
+
 <p>
-Tous les services communiquent correctement via Eureka et la Gateway.  
-Les endpoints sont accessibles de manière centralisée sur :
+  Le <strong>billing-service</strong> gère les factures.  
+  Il communique avec Customer-Service et Inventory-Service via <strong>OpenFeign</strong>,  
+  et stocke les données dans <strong>H2</strong>.
 </p>
 
+<h2>1. Entities</h2>
+
+<h3>Bill.java</h3>
+
+<pre>
+@Entity
+@Data @NoArgsConstructor @AllArgsConstructor @Builder
+public class Bill {
+    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+    private Long customerID;
+    private Date billingDate;
+    @OneToMany(mappedBy = "bill")
+    private List<ProductItem> productItems;
+    @Transient private Customer customer;
+}
+</pre>
+
+<h3>ProductItem.java</h3>
+
+<pre>
+@Entity
+@Data @NoArgsConstructor @AllArgsConstructor @Builder
+public class ProductItem {
+    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+    private Long productID;
+    private int quantity;
+    private double price;
+    @ManyToOne private Bill bill;
+    @Transient private Product product;
+}
+</pre>
+
+<hr/>
+
+<h2>2. Feign Clients</h2>
+
+<pre>
+@FeignClient(name="CUSTOMER-SERVICE")
+interface CustomerRestClient {
+    @GetMapping("/api/customers/{id}")
+    Customer findCustomerById(@PathVariable Long id);
+}
+</pre>
+
+<pre>
+@FeignClient(name="INVENTORY-SERVICE")
+interface InventoryRestClient {
+    @GetMapping("/api/products/{id}")
+    Product findProductById(@PathVariable String id);
+}
+</pre>
+
+<hr/>
+
+<h2>3. Initialisation</h2>
+
+<pre>
+@Bean
+CommandLineRunner start(...) {
+    return args -> {
+        Customer c = customerClient.findCustomerById(1L);
+        Bill bill = billRepository.save(new Bill(null, c.getId(), new Date(), null, null));
+
+        Product p = inventoryClient.findProductById("id1");
+        productItemRepository.save(
+            ProductItem.builder().productID(p.getId()).price(p.getPrice()).quantity(3).bill(bill).build()
+        );
+    };
+}
+</pre>
+
+<hr/>
+
+<h2>4. Test de l’API</h2>
+
 <ul>
-  <li><strong>http://localhost:8888/customer-service/api/customers</strong></li>
-  <li><strong>http://localhost:8888/product-service/api/products</strong></li>
+  <li><code>GET http://localhost:8083/bills</code></li>
+  <li><code>GET http://localhost:8083/bills/{id}</code></li>
 </ul>
 
-<p><strong>Architecture totalement opérationnelle </strong></p>
+<p>La réponse est enrichie avec les données Clients et Produits.</p>
 
+<hr/>
 
-<h1> Étape 5 Microservice : Billing-Service</h1>
+<h2>5. Via Gateway</h2>
 
-<p> Le microservice <strong>billing-service</strong> gère la création des factures. Il communique avec <strong>Customer-Service</strong> et <strong>Inventory-Service</strong> grâce à <strong>OpenFeign</strong>, et s’enregistre automatiquement dans <strong>Eureka</strong>. Une base <strong>H2</strong> stocke les factures et leurs articles. </p> <hr/>
-<h2>1. Package <code>entities</code></h2>
+<ul>
+  <li><code>http://localhost:8888/billing-service/bills</code></li>
+</ul>
 
-<h3> Bill.java</h3> <pre> @Entity @Data @NoArgsConstructor @AllArgsConstructor @Builder public class Bill { @Id @GeneratedValue(strategy = GenerationType.IDENTITY) private Long id; private Long customerID; private Date billingDate; @OneToMany(mappedBy = "bill") private List<ProductItem> productItems; @Transient private Customer customer; } </pre> <h3>✔ ProductItem.java</h3> <pre> @Entity @Data @NoArgsConstructor @AllArgsConstructor @Builder public class ProductItem { @Id @GeneratedValue(strategy = GenerationType.IDENTITY) private Long id; private Long productID; private int quantity; private double price; @ManyToOne private Bill bill; @Transient private Product product; } </pre> <hr/>
-<h2>2. Feign Clients</h2>
-<p>Permettent de récupérer les données des autres microservices :</p> <pre> @FeignClient(name="CUSTOMER-SERVICE") interface CustomerRestClient { @GetMapping("/api/customers/{id}") Customer findCustomerById(@PathVariable Long id); } </pre> <pre> @FeignClient(name="INVENTORY-SERVICE") interface InventoryRestClient { @GetMapping("/api/products/{id}") Product findProductById(@PathVariable String id); } </pre> <hr/>
-<h2>3. Initialisation des données</h2>
-<p>Au démarrage, une facture est créée automatiquement :</p> <pre> @Bean CommandLineRunner start(...) { return args -> { Customer c = customerClient.findCustomerById(1L); Bill bill = billRepository.save(new Bill(null, c.getId(), new Date(), null, null)); Product p = inventoryClient.findProductById("id1"); productItemRepository.save( ProductItem.builder().productID(p.getId()).price(p.getPrice()).quantity(3).bill(bill).build() ); }; } </pre> <hr/>
-<h2>4. Test de l’API</h2>
-<ul> <li><code>GET http://localhost:8083/bills</code></li> <li><code>GET http://localhost:8083/bills/{id}</code></li> </ul> <p>La réponse est automatiquement enrichie avec :</p> <ul> <li>le <strong>client</strong> associé (via Customer-Service)</li> <li>les <strong>produits</strong> associés (via Inventory-Service)</li> </ul> <hr/>
-<h2>5. Accès via Gateway</h2>
-<p>Grâce à Eureka + Gateway :</p> <ul> <li><strong>http://localhost:8888/billing-service/bills</strong></li> </ul> <p>Plus besoin de connaître les ports internes.</p> <hr/>
-<h2>Architecture après ajout</h2>
-<pre> Gateway (8888) | -------------------------------- | | | Customer Inventory Billing 8081 8082 8083 \ | / Eureka (8761) </pre>
+<hr/>
 
+<h1> Étape 6 — Microservice : config-service</h1>
 
-<p><strong>1. h2 console : table=bill :</strong></p>
-<img src="images/11.png" alt="Liste produits Gateway"/>
+<p>
+  Le <strong>config-service</strong> centralise la configuration.  
+  Nous avons testé les environnements <strong>dev</strong>, <strong>default</strong> et <strong>prod</strong>.
+</p>
 
-<p><strong>2. h2 console : table=product_item  :</strong></p>
-<img src="images/12.png" alt="Liste produits Gateway"/>
+<img src="images/22.png"/>
+<img src="images/23.png"/>
+<img src="images/24.png"/>
 
+<h3> Test avec Customer-Service </h3>
 
-<p><strong>3. Dashboard de Eureka apres l'ajout de notre billing-service  :</strong></p>
-<img src="images/14.png" alt="Liste produits Gateway"/>
+<p>
+Nous avons activé Spring Cloud Config et ajouté l’endpoint <code>/testConfig1</code> pour afficher les paramètres <strong>p1</strong> et <strong>p2</strong>.
+</p>
 
-<p><strong>4. Gestion de factures avec customer_id et product_id  :</strong></p>
-<img src="images/13.png" alt="Liste produits Gateway"/>
+<img src="images/31.png"/>
+<img src="images/32.png"/>
 
-<img src="images/15.png" alt="Liste produits Gateway"/>
+<h3> Refresh dynamique (hot reload)</h3>
 
-<img src="images/16.png" alt="Liste produits Gateway"/>
+<p>
+Grâce à l’endpoint <code>/actuator/refresh</code>, la configuration est rechargée à chaud :  
+dès qu’un paramètre est modifié dans le dépôt Git, un POST sur <code>/refresh</code> met à jour automatiquement le Customer-Service sans redémarrage.
+</p>
 
+<img src="images/41.png"/>
+<img src="images/42.png"/>
+<img src="images/43.png"/>
 
-<p><strong>5. Gestion de factures avec customer_id et product_id  :</strong></p>
+<h3> Optimisation de la config : On gere tous dans le fichier </h3>
 
-<img src="images/99.png" alt="Liste produits Gateway"/>
-
-
-
-<h1> Étape 6 Microservice : config-service</h1>
-
-
-
-<p><strong>1.Test des endpoints | environnement par default de dev avec customer-service :</strong></p>
-<img src="images/22.png" alt="Liste produits Gateway"/>
-
-<p><strong>2. Test des endpoints:environnement par default de dev avec application/default </strong></p>
-<img src="images/23.png" alt="default"/>
-
-<p><strong>3.Test des endpoints : environnement de prod</strong></p>
-<img src="images/24.png" alt="prod"/>
-
-
-
-<p>Nous avions déjà configuré notre Customer Service, mais nous avons ensuite activé l’intégration 
-avec Spring Cloud Config en ajoutant spring.cloud.config.enabled=true dans application.properties. 
-Pour vérifier que le service récupère bien les paramètres depuis le Config Service, nous avons créé un contrôleur dans le package config avec l’endpoint /testConfig1.
-Cet endpoint retourne les valeurs de p1 et p2, 
-ce qui constitue une preuve directe que Customer Service communique correctement avec le Config Service et charge sa configuration externe.</p>
-
-<img src="images/31.png" alt="prod"/>
-
-<img src="images/32.png" alt="prod"/>
+<img src="images/44.png"/>
+<img src="images/45.png"/>
